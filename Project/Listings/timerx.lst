@@ -1,0 +1,69 @@
+C51 COMPILER V9.60.0.0   TIMERX                                                            03/05/2023 23:49:50 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE TIMERX
+OBJECT MODULE PLACED IN .\Objects\timerx.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE src\timerx.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\inc;.\Library\Device\Incl
+                    -ude;.\Library\StdDriver\inc;..\Project) DEBUG OBJECTEXTEND PRINT(.\Listings\timerx.lst) TABS(2) OBJECT(.\Objects\timerx.
+                    -obj)
+
+line level    source
+
+   1          /**
+   2            ******************************************************************************************
+   3            *  @file    timer.h
+   4            *  @author  phucpv
+   5            *  @version 1.0
+   6            *  @date    15/06/2022
+   7            *  @brief   timer for MS51FB9AE.
+   8            ******************************************************************************************
+   9            *  @attention
+  10            *  1. Any commercial product related to this source code is required to specify the source.
+  11            *  <h2><center>&copy; COPYRIGHT 2022 xxx.com </center></h2>
+  12            ******************************************************************************************
+  13          */
+  14          #include "MS51_16K.H"
+  15          #include "timerx.h"
+  16          
+  17          /* TIMER1 Init */
+  18          void TIM1_init(void)
+  19          {
+  20   1        ENABLE_TIMER1_MODE1;
+  21   1        TIMER1_FSYS;
+  22   1      
+  23   1        TH1 = TH1_INIT;
+  24   1        TL1 = TL1_INIT;
+  25   1      
+  26   1        ENABLE_TIMER1_INTERRUPT;                       //enable Timer1 interrupt
+  27   1        ENABLE_GLOBAL_INTERRUPT;                       //enable interrupts
+  28   1      
+  29   1        set_TCON_TR1;                                  //Timer1 run
+  30   1      }
+  31          /**
+  32            @}
+  33          */
+  34          
+  35          /**
+  36            @}
+  37          */
+  38          
+  39          /**
+  40            @}
+  41          */
+  42          /******************** (C) COPYRIGHT 2022 xxx.com *****END OF FILE************/
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     22    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.60.0.0   TIMERX                                                            03/05/2023 23:49:50 PAGE 2   
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

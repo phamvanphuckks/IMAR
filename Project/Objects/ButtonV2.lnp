@@ -1,0 +1,14 @@
+".\Objects\STARTUP.obj",
+".\Objects\gpio.obj",
+".\Objects\delay.obj",
+".\Objects\eeprom.obj",
+".\Objects\wdt.obj",
+".\Objects\uart.obj",
+".\Objects\ds1307.obj",
+".\Objects\main.obj",
+".\Objects\app.obj",
+".\Objects\sys.obj",
+".\Objects\PUTCHAR.obj" 
+TO ".\Objects\ButtonV2" 
+PRINT(".\Listings\ButtonV2.m51") RAMSIZE(256) 
+DISABLEWARNING (16) 

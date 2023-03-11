@@ -1,0 +1,45 @@
+C51 COMPILER V9.60.0.0   GPIO                                                              03/11/2023 08:47:28 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE GPIO
+OBJECT MODULE PLACED IN .\Objects\gpio.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE src\gpio.c OPTIMIZE(7,SPEED) BROWSE INCDIR(.\inc;.\Library\Device\Includ
+                    -e;.\Library\StdDriver\inc;..\Project) DEFINE(FOSC_240000) DEBUG OBJECTEXTEND PRINT(.\Listings\gpio.lst) TABS(2) OBJECT(.
+                    -\Objects\gpio.obj)
+
+line level    source
+
+   1          #include "MS51_16K.H"
+   2          #include "gpio.h"
+   3          #include "hw_config.h"
+   4          
+   5          void GPIO_init(void)
+   6          {
+   7   1          /* Set up Px As input mode */
+   8   1          P00_INPUT_MODE; // COS
+   9   1          P10_INPUT_MODE; // PAS
+  10   1        
+  11   1          /* Set up Px As output mode */
+  12   1          P11_PUSHPULL_MODE; // Relay 1, LED1
+  13   1          P12_PUSHPULL_MODE; // Relay 2, LED2
+  14   1      
+  15   1          /* Set up Px As Quasi */
+  16   1          P13_QUASI_MODE;  // SCL
+  17   1          P14_QUASI_MODE;  // SDA
+  18   1        
+  19   1          P06_QUASI_MODE; // UART_TX
+  20   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    170    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

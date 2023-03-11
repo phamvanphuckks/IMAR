@@ -1,0 +1,1 @@
+"main.c" OPTIMIZE (7,SPEED) BROWSE INCDIR(.\inc;.\Library\Device\Include;.\Library\StdDriver\inc;..\Project) DEFINE (FOSC_240000) DEBUG OBJECTEXTEND PRINT(.\Listings\main.lst) TABS (2) OBJECT(.\Objects\main.obj)

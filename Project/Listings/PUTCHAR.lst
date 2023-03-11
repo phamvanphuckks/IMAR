@@ -1,0 +1,71 @@
+C51 COMPILER V9.60.0.0   PUTCHAR                                                           03/10/2023 07:43:48 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE PUTCHAR
+OBJECT MODULE PLACED IN .\Objects\PUTCHAR.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE src\PUTCHAR.C OPTIMIZE(7,SPEED) BROWSE INCDIR(.\inc;.\Library\Device\Inc
+                    -lude;.\Library\StdDriver\inc;..\Project) DEFINE(FOSC_240000) DEBUG OBJECTEXTEND PRINT(.\Listings\PUTCHAR.lst) TABS(2) OB
+                    -JECT(.\Objects\PUTCHAR.obj)
+
+line level    source
+
+   1          /***********************************************************************/
+   2          /*  This file is part of the C51 Compiler package                      */
+   3          /*  Copyright KEIL ELEKTRONIK GmbH 1990 - 2002                         */
+   4          /***********************************************************************/
+   5          /*                                                                     */
+   6          /*  PUTCHAR.C:  This routine is the general character output of C51.   */
+   7          /*  You may add this file to a uVision2 project.                       */
+   8          /*                                                                     */
+   9          /*  To translate this file use C51 with the following invocation:      */
+  10          /*     C51 PUTCHAR.C <memory model>                                    */
+  11          /*                                                                     */
+  12          /*  To link the modified PUTCHAR.OBJ file to your application use the  */
+  13          /*  following Lx51 invocation:                                         */
+  14          /*     Lx51 <your object file list>, PUTCHAR.OBJ <controls>            */
+  15          /*                                                                     */
+  16          /***********************************************************************/
+  17          #include "MS51_16K.H"
+  18          
+  19          /****************************************************************************/
+  20          /* Define putchar send from UART1, printf function will send from P1.6(TXD_1)
+  21          /* NOTICE: Since UART1 pin is multi-function with OCD DATA/CLK pin.
+  22          /* Suggest download than use run with realchip but not OCD mode.
+  23          /****************************************************************************/
+  24          #if 0
+              char putchar (char c)        //for UART1_printf
+              {
+                  while (!TI_1);  /* wait until transmitter ready */
+                  TI_1 = 0;
+                  SBUF_1 = c;      /* output character */
+                  return (c);
+              }
+              #else
+  33          /*
+  34           * putchar (mini version): outputs charcter only
+  35           */
+  36          char putchar (char c)        //for UART0_printf
+  37          {        
+  38   1        while (!TI);
+  39   1        TI = 0;
+  40   1        SBUF = c;
+  41   1        return (c);
+  42   1      }
+  43          
+  44          #endif
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =      8    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+C51 COMPILER V9.60.0.0   PUTCHAR                                                           03/10/2023 07:43:48 PAGE 2   
+
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

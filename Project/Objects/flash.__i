@@ -1,0 +1,1 @@
+"flash.c" OPTIMIZE (7,SPEED) BROWSE INCDIR(.\inc;.\Library\Device\Include;.\Library\StdDriver\inc;..\Project) DEBUG OBJECTEXTEND PRINT(.\Listings\flash.lst) TABS (2) OBJECT(.\Objects\flash.obj)
