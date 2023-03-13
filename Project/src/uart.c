@@ -10,10 +10,74 @@
 /*  Date   : Jan/21/2020                                                                                   */
 /***********************************************************************************************************/
 #include "MS51_16K.H"
+#include "uart.h"
+
 bit PRINTFG = 0, uart0_receive_flag = 0, uart1_receive_flag;
 unsigned char uart0_receive_data, uart1_receive_data;
 
+// ring buffer
+volatile char xdata Rx_buffer[MAX_BUFFER];
+volatile uint16_t pHead = 0, pTail = 0;
 
+
+uint8_t IsAvailable(void)
+{
+	return (uint16_t)(MAX_BUFFER + pHead - pTail) % MAX_BUFFER;
+}
+
+uint8_t IsFull(void) 
+{
+	return (pHead + 1 == pTail);
+}
+
+void uartFresh(void)
+{
+	pHead = 0;
+	pTail = 0;
+
+	memset(Rx_buffer, 0, MAX_BUFFER);
+}
+
+void uartResetNByte(void)
+{
+	memset(&Rx_buffer[pHead - 13], 0, 13);
+}
+
+uint8_t IsEmpty(void) 
+{
+    return (pHead == pTail);
+}
+
+unsigned char IsData(void) 
+{
+	return Rx_buffer[pHead - 1];
+}
+
+void uartWriteByte(unsigned char item) 
+{
+    if (IsFull()) 
+		{
+			return;
+    }
+
+    Rx_buffer[pHead++] = item;
+    pHead %= MAX_BUFFER;
+}
+
+unsigned char uartReadByte(void) 
+{
+    char item;
+
+    if (IsEmpty()) 
+		{
+        return '\0';
+    }
+
+    item = Rx_buffer[pTail++];
+    pTail %= MAX_BUFFER;
+
+    return item;
+}
 
 void Serial_ISR(void) interrupt 4
 {
@@ -23,6 +87,7 @@ void Serial_ISR(void) interrupt 4
     {
         uart0_receive_flag = 1;
         uart0_receive_data = SBUF;
+			  uartWriteByte(uart0_receive_data);
         clr_SCON_RI;                                         // Clear RI (Receive Interrupt).
     }
 
@@ -36,8 +101,6 @@ void Serial_ISR(void) interrupt 4
 
     _pop_(SFRS);
 }	
-
-
 
 void SerialPort1_ISR(void) interrupt 15
 {

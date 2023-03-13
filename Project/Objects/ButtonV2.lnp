@@ -5,6 +5,7 @@
 ".\Objects\wdt.obj",
 ".\Objects\uart.obj",
 ".\Objects\ds1307.obj",
+".\Objects\timerx.obj",
 ".\Objects\main.obj",
 ".\Objects\app.obj",
 ".\Objects\sys.obj",

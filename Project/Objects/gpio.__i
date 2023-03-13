@@ -1,1 +1,1 @@
-"src\gpio.c" OPTIMIZE (7,SPEED) BROWSE INCDIR(.\inc;.\Library\Device\Include;.\Library\StdDriver\inc;..\Project) DEFINE (FOSC_240000) DEBUG OBJECTEXTEND PRINT(.\Listings\gpio.lst) TABS (2) OBJECT(.\Objects\gpio.obj)
+"src\gpio.c" OPTIMIZE (7,SPEED) BROWSE INCDIR(.\inc;.\Library\Device\Include;.\Library\StdDriver\inc;..\Project) DEBUG OBJECTEXTEND PRINT(.\Listings\gpio.lst) TABS (2) OBJECT(.\Objects\gpio.obj)

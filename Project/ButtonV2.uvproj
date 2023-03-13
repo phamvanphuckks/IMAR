@@ -322,7 +322,7 @@
             <InterruptVectorAddress>0</InterruptVectorAddress>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>FOSC_240000</Define>
+              <Define></Define>
               <Undefine></Undefine>
               <IncludePath>.\inc;.\Library\Device\Include;.\Library\StdDriver\inc;..\Project</IncludePath>
             </VariousControls>
@@ -416,6 +416,11 @@
               <FileType>1</FileType>
               <FilePath>.\src\ds1307.c</FilePath>
             </File>
+            <File>
+              <FileName>timerx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\src\timerx.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -455,6 +460,11 @@
               <FileName>ds1307.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\inc\ds1307.h</FilePath>
+            </File>
+            <File>
+              <FileName>timerx.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\timerx.h</FilePath>
             </File>
           </Files>
         </Group>

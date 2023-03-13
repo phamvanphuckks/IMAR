@@ -2,6 +2,7 @@
 #define __APP_H__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "hw_config.h"
@@ -9,6 +10,7 @@
 #include "delay.h"
 #include "gpio.h"
 #include "uart.h"
+#include "timerx.h"
 #include "ds1307.h"
 
 typedef enum STATUS {
@@ -48,10 +50,12 @@ void app_process_action(void);
  *       None.
  */
 void app_init(void);
+void uart_init(void);
 
 void check_button(void);
 void check_btn_last_state(void);
 void ds1307(void);
-void uart_init(void);
+void check_uart(void);
+void parser_data(char *header, char *hours, char *minutes, char *second, char *payload);
 
 #endif

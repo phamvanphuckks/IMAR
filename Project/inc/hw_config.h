@@ -22,5 +22,5 @@
 #define DS1307_MINUTE_SETUP_ADDRESS             0x3024 
 #define DS1307_SECOND_SETUP_ADDRESS             0x3028 
 
-#define FREQ_SYS	  24000000
+#define FREQ_SYS	  16000000
 #endif

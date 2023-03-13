@@ -516,7 +516,7 @@ uint8_t bcd2dec(uint8_t value)
 {
 	uint8_t m, n;
 	
-	m = (uint8_t)((m >> 4) * 10);
+	m = (uint8_t)((value >> 4) * 10);
 	n = value & (uint8_t)0x0F;
 
 	return (m + n);
