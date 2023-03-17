@@ -542,7 +542,7 @@ void DS1307_Set_Current_Time(RTC_time_t *rtc_time)
 	{
 		hours |= ~(1 << 6);
 		
-		if(rtc_time->time_format == TIME_FORMAT_24HRS)
+		if(rtc_time->time_format == TIME_FORMAT_12HRS_PM)
 		{
 			hours |= (1 << 5);
 		}
@@ -604,23 +604,12 @@ void DS1307_Get_Current_Date(RTC_date_t *rtc_date)
 	DS1307_Read(DS1307_DAY, &day, 1);
 	rtc_date->day = bcd2dec(day);
 	
-	rtc_date->date = bcd2dec(date);
 	DS1307_Read(DS1307_DATE, &date, 1);
+	rtc_date->date = bcd2dec(date);
 	
-	rtc_date->month = bcd2dec(month);
 	DS1307_Read(DS1307_MONTH, &month, 1);
+	rtc_date->month = bcd2dec(month);
 	
-	rtc_date->year = bcd2dec(year);
 	DS1307_Read(DS1307_YEAR, &year, 1);
-}
-
-void DS1307_Set_Time(uint8_t hr, uint8_t min, uint8_t sec, uint8_t wd, uint8_t d, uint8_t mth, uint8_t yr)
-{
-	DS1307_Write(DS1307_SECONDS, &sec, 1);
-	DS1307_Write(DS1307_MINUTES, &min, 1);
-	DS1307_Write(DS1307_HOURS, &hr, 1);
-	DS1307_Write(DS1307_DAY, &wd, 1); // day of week: Sunday = 1, Saturday = 7
-	DS1307_Write(DS1307_DATE, &d, 1);
-	DS1307_Write(DS1307_MONTH, &mth, 1);
-	DS1307_Write(DS1307_YEAR, &yr, 1);
+	rtc_date->year = bcd2dec(year);
 }

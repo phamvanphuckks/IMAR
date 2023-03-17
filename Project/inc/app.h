@@ -13,10 +13,29 @@
 #include "timerx.h"
 #include "ds1307.h"
 
+#define PAYLOAD_LEN    13
+
+#define TIME2SECOND(h, m, s) ((h)*3600 + (m)*60 + (s))
+
 typedef enum STATUS {
 	ON  = 1,
-	OFF = !ON
+	OFF = !ON,
+	FLOATNG,
+	WRAP_TIME,
+	LINE_TIME
 } stt_t;
+
+typedef enum {
+	NORMAL = 1,
+	PASS_HOLD_3S,
+	ALARM_START,
+	ALARM_STOP
+} STATE_t;
+
+typedef enum {
+	LOW = 0,
+	HIGH,
+};
 
 typedef enum {
   /** Success return value - no error occurred */
@@ -50,12 +69,13 @@ void app_process_action(void);
  *       None.
  */
 void app_init(void);
-void uart_init(void);
 
+void uart_init(void);
 void check_button(void);
 void check_btn_last_state(void);
+void check_timer(void);
 void ds1307(void);
 void check_uart(void);
-void parser_data(char *header, char *hours, char *minutes, char *second, char *payload);
+void parser_data(char *header, char *hours, char *minutes, char *seconds, char *payLoad);
 
 #endif

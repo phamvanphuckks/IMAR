@@ -18,7 +18,7 @@ unsigned char Receive_Data(unsigned char UARTPort);
 void Enable_UART0_VCOM_printf_24M_115200(void);
 
 void uartFresh(void);
-void uartResetNByte(void);
+void uartResetNByte(uint8_t len);
 uint8_t IsAvailable(void);
 uint8_t IsFull(void);
 uint8_t IsEmpty(void);

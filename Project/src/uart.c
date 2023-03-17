@@ -38,9 +38,9 @@ void uartFresh(void)
 	memset(Rx_buffer, 0, MAX_BUFFER);
 }
 
-void uartResetNByte(void)
+void uartResetNByte(uint8_t len)
 {
-	memset(&Rx_buffer[pHead - 13], 0, 13);
+	memset(&Rx_buffer[pHead - len], 0, len);
 }
 
 uint8_t IsEmpty(void) 
