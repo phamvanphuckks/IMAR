@@ -310,6 +310,8 @@ void check_uart(void)
 				Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
 				Write_DATAFLASH_BYTE(DS1307_TIMER_EN_FLAG, timer_en_flag);
 				
+				check_btn_last_state();
+				
 				printf("DISABLE\r\n");
 			}
 			else if((val_1 == 11) && (val_2 == 11) && (val_3 == 11))

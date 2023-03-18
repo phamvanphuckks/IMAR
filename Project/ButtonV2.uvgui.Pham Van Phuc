@@ -3606,11 +3606,11 @@
       <ActiveTab>0</ActiveTab>
       <Doc>
         <Name>.\src\app.c</Name>
-        <ColumnNumber>21</ColumnNumber>
-        <TopLine>47</TopLine>
-        <CurrentLine>404</CurrentLine>
+        <ColumnNumber>8</ColumnNumber>
+        <TopLine>61</TopLine>
+        <CurrentLine>314</CurrentLine>
         <Folding>1</Folding>
-        <ContractedFolders>31,55,64,74,150,177,223,229,238,249,258,277,296,326,337,510</ContractedFolders>
+        <ContractedFolders>31,55,64,74,150,177,229,238,249,258,277,328,339,381,395,408,428,453,467,488,512</ContractedFolders>
         <PaneID>0</PaneID>
       </Doc>
     </MDIGroup>
