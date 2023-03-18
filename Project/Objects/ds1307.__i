@@ -1,1 +1,0 @@
-"src\ds1307.c" OPTIMIZE (7,SPEED) BROWSE INCDIR(.\inc;.\Library\Device\Include;.\Library\StdDriver\inc;..\Project) DEBUG OBJECTEXTEND PRINT(.\Listings\ds1307.lst) TABS (2) OBJECT(.\Objects\ds1307.obj)

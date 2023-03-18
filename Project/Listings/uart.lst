@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   UART                                                              03/18/2023 00:00:05 PAGE 1   
+C51 COMPILER V9.60.0.0   UART                                                              03/18/2023 13:07:30 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE UART
@@ -62,7 +62,7 @@ line level    source
   42          {
   43   1        memset(&Rx_buffer[pHead - len], 0, len);
   44   1      }
-C51 COMPILER V9.60.0.0   UART                                                              03/18/2023 00:00:05 PAGE 2   
+C51 COMPILER V9.60.0.0   UART                                                              03/18/2023 13:07:30 PAGE 2   
 
   45          
   46          uint8_t IsEmpty(void) 
@@ -126,7 +126,7 @@ line level    source
  104          
  105          void SerialPort1_ISR(void) interrupt 15
  106          {
-C51 COMPILER V9.60.0.0   UART                                                              03/18/2023 00:00:05 PAGE 3   
+C51 COMPILER V9.60.0.0   UART                                                              03/18/2023 13:07:30 PAGE 3   
 
  107   1          _push_(SFRS);
  108   1        
@@ -190,7 +190,7 @@ line level    source
                   UINT8 c;
                   switch (UARTPort)
                   {
-C51 COMPILER V9.60.0.0   UART                                                              03/18/2023 00:00:05 PAGE 4   
+C51 COMPILER V9.60.0.0   UART                                                              03/18/2023 13:07:30 PAGE 4   
 
                     case UART0:
                       while (!RI);

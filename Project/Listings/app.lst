@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 12:49:56 PAGE 1   
+C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 17:55:14 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE APP
@@ -26,7 +26,7 @@ line level    source
   16          
   17          static uint8_t timer_flag    = FLOATNG;
   18          static uint8_t timer_en_flag = LOW;
-  19          static uint8_t timer_mode    = FLOATNG;
+  19          static uint8_t timer_mode_flag    = FLOATNG;
   20          
   21          char xdata payLoad[PAYLOAD_LEN];
   22          unsigned char xdata index_data = 0;
@@ -62,500 +62,498 @@ line level    source
   52   1        check_button();
   53   1      
   54   1        check_uart();
-C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 12:49:56 PAGE 2   
+C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 17:55:14 PAGE 2   
 
   55   1      
   56   1        check_ds1307();
   57   1      }
   58          
-  59          uint32_t time2second(uint8_t h, uint8_t m, uint8_t s) 
+  59          void uart_init(void)
   60          {
-  61   1        return (uint32_t)((uint32_t)(h)*3600 + (uint32_t)(m)*60 + (uint8_t)(s));
-  62   1      }
-  63          
-  64          void uart_init(void)
-  65          {
-  66   1        UART_Open(FREQ_SYS, UART0_Timer3, 9600);
-  67   1        ENABLE_UART0_PRINTF;
-  68   1        ENABLE_UART0_INTERRUPT;   /* Enable UART0 interrupt */
-  69   1        ENABLE_GLOBAL_INTERRUPT;  /* Global interrupt enable */
-  70   1        
-  71   1        uartFresh();
-  72   1      }
-  73          
-  74          void check_button(void)
-  75          {
-  76   1        uint16_t timeout = 0, last_state;
-  77   1        
-  78   1        if (timer_flag == FLOATNG)
-  79   1        {
-  80   2          if (state == NORMAL)
-  81   2          {
-  82   3            if(BTN2_PAS == HIGH)
-  83   3            {
-  84   4              LED_RELAY2 = HIGH;
-  85   4              Delay_ms(10);
-  86   4              while (BTN2_PAS == HIGH)
-  87   4              {
-  88   5                if(timeout == 2000)
-  89   5                {  
-  90   6                  LED_RELAY1 = LOW;         
-  91   6                  LED_RELAY2 = HIGH;
-  92   6                  state = PASS_HOLD_3S;
-  93   6                  
-  94   6                  last_state = Read_APROM_BYTE(STATE_MODE);
-  95   6                  if( last_state != PASS_HOLD_3S)
-  96   6                  {
-  97   7                    Write_DATAFLASH_BYTE(STATE_MODE, state);
-  98   7                  }
-  99   6                }
- 100   5                Delay_ms(1);
- 101   5                timeout++;
- 102   5              }
- 103   4            }
- 104   3            else 
- 105   3            {
- 106   4              LED_RELAY2 = (BTN1_COS == HIGH)? HIGH : LOW;
- 107   4            }
- 108   3          }
- 109   2          
- 110   2          if (state == PASS_HOLD_3S)
- 111   2          {
- 112   3            if(BTN2_PAS == HIGH)
- 113   3            {
- 114   4              LED_RELAY1 = HIGH;
- 115   4              Delay_ms(10);
- 116   4              
-C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 12:49:56 PAGE 3   
+  61   1        UART_Open(FREQ_SYS, UART0_Timer3, 9600);
+  62   1        ENABLE_UART0_PRINTF;
+  63   1        ENABLE_UART0_INTERRUPT;   /* Enable UART0 interrupt */
+  64   1        ENABLE_GLOBAL_INTERRUPT;  /* Global interrupt enable */
+  65   1      
+  66   1        uartFresh();
+  67   1      }
+  68          
+  69          void check_button(void)
+  70          {
+  71   1        uint16_t timeout = 0, last_state;
+  72   1        
+  73   1        if (timer_flag == FLOATNG)
+  74   1        {
+  75   2          if (state == NORMAL)
+  76   2          {
+  77   3            if(BTN2_PAS == HIGH)
+  78   3            {
+  79   4              LED_RELAY2 = HIGH;
+  80   4              Delay_ms(10);
+  81   4              while (BTN2_PAS == HIGH)
+  82   4              {
+  83   5                if(timeout == 2000)
+  84   5                {  
+  85   6                  LED_RELAY1 = LOW;         
+  86   6                  LED_RELAY2 = HIGH;
+  87   6                  state = PASS_HOLD_3S;
+  88   6                  
+  89   6                  last_state = Read_APROM_BYTE(STATE_MODE);
+  90   6                  if( last_state != PASS_HOLD_3S)
+  91   6                  {
+  92   7                    Write_DATAFLASH_BYTE(STATE_MODE, state);
+  93   7                  }
+  94   6                }
+  95   5                Delay_ms(1);
+  96   5                timeout++;
+  97   5              }
+  98   4            }
+  99   3            else 
+ 100   3            {
+ 101   4              LED_RELAY2 = (BTN1_COS == HIGH)? HIGH : LOW;
+ 102   4            }
+ 103   3          }
+ 104   2          
+ 105   2          if (state == PASS_HOLD_3S)
+ 106   2          {
+ 107   3            if(BTN2_PAS == HIGH)
+ 108   3            {
+ 109   4              LED_RELAY1 = HIGH;
+ 110   4              Delay_ms(10);
+ 111   4              
+ 112   4              timeout = 0;
+ 113   4              while (BTN2_PAS == HIGH)
+ 114   4              {
+ 115   5                if(timeout == 2000)
+ 116   5                {  
+C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 17:55:14 PAGE 3   
 
- 117   4              timeout = 0;
- 118   4              while (BTN2_PAS == HIGH)
- 119   4              {
- 120   5                if(timeout == 2000)
- 121   5                {  
- 122   6                  LED_RELAY2 = LOW;
- 123   6                    
- 124   6                  LED_RELAY1 = HIGH;
- 125   6                  Delay_ms(100);
- 126   6                  LED_RELAY1 = LOW;
- 127   6                  Delay_ms(100);
- 128   6                  LED_RELAY1 = HIGH;
- 129   6                    
- 130   6                  state = NORMAL;
- 131   6                  
- 132   6                  last_state = Read_APROM_BYTE(STATE_MODE);
- 133   6                  if( last_state != NORMAL)
- 134   6                  {
- 135   7                    Write_DATAFLASH_BYTE(STATE_MODE, state);
- 136   7                  }
- 137   6                }
- 138   5                Delay_ms(1);
- 139   5                timeout++;
- 140   5              }
- 141   4            }
- 142   3            else
- 143   3            {
- 144   4              LED_RELAY1 = 0;
- 145   4            }
- 146   3          }
- 147   2        }
- 148   1      }
- 149          
- 150          void check_btn_last_state(void)
- 151          {   
- 152   1        uint8_t last_state;
- 153   1        
- 154   1        last_state = Read_APROM_BYTE(STATE_MODE);
- 155   1        if(last_state != 0xFF)
+ 117   6                  LED_RELAY2 = LOW;
+ 118   6                    
+ 119   6                  LED_RELAY1 = HIGH;
+ 120   6                  Delay_ms(100);
+ 121   6                  LED_RELAY1 = LOW;
+ 122   6                  Delay_ms(100);
+ 123   6                  LED_RELAY1 = HIGH;
+ 124   6                    
+ 125   6                  state = NORMAL;
+ 126   6                  
+ 127   6                  last_state = Read_APROM_BYTE(STATE_MODE);
+ 128   6                  if( last_state != NORMAL)
+ 129   6                  {
+ 130   7                    Write_DATAFLASH_BYTE(STATE_MODE, state);
+ 131   7                  }
+ 132   6                }
+ 133   5                Delay_ms(1);
+ 134   5                timeout++;
+ 135   5              }
+ 136   4            }
+ 137   3            else
+ 138   3            {
+ 139   4              LED_RELAY1 = 0;
+ 140   4            }
+ 141   3          }
+ 142   2        }
+ 143   1      }
+ 144          
+ 145          void check_btn_last_state(void)
+ 146          {   
+ 147   1        uint8_t tmp;
+ 148   1        
+ 149   1        tmp = Read_APROM_BYTE(STATE_MODE);
+ 150   1        if(tmp != 0xFF)
+ 151   1        {
+ 152   2          state = tmp;
+ 153   2        }
+ 154   1        
+ 155   1        if(state == NORMAL)
  156   1        {
- 157   2          state = last_state;
- 158   2        }
- 159   1        
- 160   1        if(state == NORMAL)
+ 157   2          LED_RELAY1 = 1;
+ 158   2          LED_RELAY2 = 0;   
+ 159   2        }
+ 160   1        else if (state == PASS_HOLD_3S)
  161   1        {
- 162   2          LED_RELAY1 = 1;
- 163   2          LED_RELAY2 = 0;   
+ 162   2          LED_RELAY1 = 0;
+ 163   2          LED_RELAY2 = 1;   
  164   2        }
- 165   1        else if (state == PASS_HOLD_3S)
+ 165   1        else 
  166   1        {
- 167   2          LED_RELAY1 = 0;
- 168   2          LED_RELAY2 = 1;   
+ 167   2          LED_RELAY1 = 1;
+ 168   2          LED_RELAY2 = 0;
  169   2        }
- 170   1        else 
- 171   1        {
- 172   2          LED_RELAY1 = 1;
- 173   2          LED_RELAY2 = 0;
- 174   2        }
- 175   1      }
- 176          
- 177          void check_timer(void)
- 178          {
-C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 12:49:56 PAGE 4   
+ 170   1      }
+ 171          
+ 172          void check_timer(void)
+ 173          {
+ 174   1        uint8_t tmp;
+ 175   1        
+ 176   1        t_hour_begin     = Read_APROM_BYTE(DS1307_HOURS_START_ADDRESS);
+ 177   1        t_minute_begin   = Read_APROM_BYTE(DS1307_MINUTE_START_ADDRESS);
+ 178   1        t_second_begin   = Read_APROM_BYTE(DS1307_SECOND_START_ADDRESS);
+C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 17:55:14 PAGE 4   
 
- 179   1        uint8_t tmp;
- 180   1        
- 181   1        t_hour_begin     = Read_APROM_BYTE(DS1307_HOURS_START_ADDRESS);
- 182   1        t_minute_begin   = Read_APROM_BYTE(DS1307_MINUTE_START_ADDRESS);
- 183   1        t_second_begin   = Read_APROM_BYTE(DS1307_SECOND_START_ADDRESS);
- 184   1        
- 185   1        t_hour_end    = Read_APROM_BYTE(DS1307_HOURS_STOP_ADDRESS);
- 186   1        t_minute_end  = Read_APROM_BYTE(DS1307_MINUTE_STOP_ADDRESS);
- 187   1        t_second_end  = Read_APROM_BYTE(DS1307_SECOND_STOP_ADDRESS);
- 188   1        
- 189   1        tmp = Read_APROM_BYTE(DS1307_TIME_MODE_FLAG); 
- 190   1        if(tmp != 0xff)
- 191   1        {
- 192   2          timer_mode = tmp;
- 193   2        }
- 194   1        
- 195   1        tmp = Read_APROM_BYTE(DS1307_TIMER_FLAG);
- 196   1        if(tmp != 0xff)
- 197   1        {
- 198   2          timer_flag = tmp;
- 199   2        }
- 200   1        
- 201   1        tmp = Read_APROM_BYTE(DS1307_TIMER_EN_FLAG);
- 202   1        if(tmp != 0xff)
+ 179   1        
+ 180   1        t_hour_end       = Read_APROM_BYTE(DS1307_HOURS_STOP_ADDRESS);
+ 181   1        t_minute_end     = Read_APROM_BYTE(DS1307_MINUTE_STOP_ADDRESS);
+ 182   1        t_second_end     = Read_APROM_BYTE(DS1307_SECOND_STOP_ADDRESS);
+ 183   1        
+ 184   1        tmp = Read_APROM_BYTE(DS1307_TIMER_MODE_FLAG);  
+ 185   1        if(tmp != 0xff)
+ 186   1        {
+ 187   2          timer_mode_flag = tmp;
+ 188   2        }
+ 189   1        
+ 190   1        tmp = Read_APROM_BYTE(DS1307_TIMER_FLAG);
+ 191   1        if(tmp != 0xff)
+ 192   1        {
+ 193   2          timer_flag = tmp;
+ 194   2        }
+ 195   1        
+ 196   1        tmp = Read_APROM_BYTE(DS1307_TIMER_EN_FLAG);
+ 197   1        if(tmp != 0xff)
+ 198   1        {
+ 199   2          timer_en_flag = tmp;
+ 200   2        }
+ 201   1        
+ 202   1        if(timer_flag == HIGH)
  203   1        {
- 204   2          timer_en_flag = tmp;
- 205   2        }
- 206   1        
- 207   1        if(timer_flag == HIGH)
+ 204   2          LED_RELAY1 = HIGH;
+ 205   2          LED_RELAY2 = LOW;
+ 206   2        }
+ 207   1        else if(timer_flag == LOW)
  208   1        {
- 209   2          LED_RELAY1 = HIGH;
+ 209   2          LED_RELAY1 = LOW;
  210   2          LED_RELAY2 = LOW;
  211   2        }
- 212   1        else if(timer_flag == LOW)
+ 212   1        else 
  213   1        {
- 214   2          LED_RELAY1 = LOW;
- 215   2          LED_RELAY2 = LOW;
- 216   2        }
- 217   1        else 
- 218   1        {
- 219   2          
- 220   2        }
- 221   1      }
- 222          
- 223          void check_uart(void)
- 224          {
- 225   1        char xdata header[3], hours[3], minutes[3], seconds[3];
- 226   1        
- 227   1        if (IsData() == '#')
- 228   1        {
- 229   2          while(IsAvailable()) // read from message header
- 230   2          {
- 231   3            if (uartReadByte() == '$') 
- 232   3            {
- 233   4              payLoad[index_data++] = '$';
- 234   4              break;
- 235   4            }
+ 214   2          
+ 215   2        }
+ 216   1      }
+ 217          
+ 218          void check_uart(void)
+ 219          {
+ 220   1        char xdata header[3], hours[3], minutes[3], seconds[3];
+ 221   1        
+ 222   1        if (IsData() == '#')
+ 223   1        {
+ 224   2          while(IsAvailable()) // read from message header
+ 225   2          {
+ 226   3            if (uartReadByte() == '$') 
+ 227   3            {
+ 228   4              payLoad[index_data++] = '$';
+ 229   4              break;
+ 230   4            }
+ 231   3          }
+ 232   2          
+ 233   2          while(IsAvailable()) // read the message body
+ 234   2          {
+ 235   3            payLoad[index_data++] = uartReadByte();
  236   3          }
- 237   2          
- 238   2          while(IsAvailable()) // read the message body
- 239   2          {
- 240   3            payLoad[index_data++] = uartReadByte();
-C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 12:49:56 PAGE 5   
+ 237   2          payLoad[index_data] = '\0';
+ 238   2          // clear buffer
+ 239   2          uartResetNByte(PAYLOAD_LEN);
+ 240   2          
+C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 17:55:14 PAGE 5   
 
- 241   3          }
- 242   2          payLoad[index_data] = '\0';
- 243   2          // clear buffer
- 244   2          uartResetNByte(PAYLOAD_LEN);
- 245   2          
- 246   2          // parser data
- 247   2          parser_data(header, hours, minutes, seconds, payLoad);
- 248   2          
- 249   2          if(!strcmp(header, "$C"))
- 250   2          {
- 251   3            rtc_time.hours       = atoi(hours);
- 252   3            rtc_time.minutes     = atoi(minutes);
- 253   3            rtc_time.seconds     = atoi(seconds);
- 254   3            DS1307_Set_Current_Time(&rtc_time);
- 255   3        
- 256   3            printf("\nOK\n");
- 257   3          }
- 258   2          else if (!strcmp(header, "$S")) // time A
- 259   2          {
- 260   3            t_hour_begin     = atoi(hours);
- 261   3            t_minute_begin   = atoi(minutes);
- 262   3            t_second_begin   = atoi(seconds);
- 263   3        
- 264   3            Write_DATAFLASH_BYTE(DS1307_HOURS_START_ADDRESS, t_hour_begin);
- 265   3            Write_DATAFLASH_BYTE(DS1307_MINUTE_START_ADDRESS, t_minute_begin);
- 266   3            Write_DATAFLASH_BYTE(DS1307_SECOND_START_ADDRESS, t_second_begin);  
- 267   3      
- 268   3            printf("\nOK\n");     
- 269   3          }
- 270   2          else if (!strcmp(header, "$E")) // time B
- 271   2          {
- 272   3            t_hour_end     = atoi(hours);
- 273   3            t_minute_end   = atoi(minutes);
- 274   3            t_second_end   = atoi(seconds);
- 275   3        
- 276   3            Write_DATAFLASH_BYTE(DS1307_HOURS_STOP_ADDRESS, t_hour_end);
- 277   3            Write_DATAFLASH_BYTE(DS1307_MINUTE_STOP_ADDRESS, t_minute_end);
- 278   3            Write_DATAFLASH_BYTE(DS1307_SECOND_STOP_ADDRESS, t_second_end);     
- 279   3      
- 280   3            printf("\nOK\n");
- 281   3          }
- 282   2          else if (!strcmp(header, "$A")) // enable/disable timer
- 283   2          {
- 284   3            uint8_t val_1, val_2, val_3;
- 285   3            
- 286   3            val_1   = atoi(hours);
- 287   3            val_2   = atoi(minutes);
- 288   3            val_3   = atoi(seconds);
- 289   3            
- 290   3            if((val_1 == 0) && (val_2 == 0) && (val_3 == 0))
- 291   3            {
- 292   4              timer_en_flag = LOW;
- 293   4              timer_flag = FLOATNG;
- 294   4              
- 295   4              Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
- 296   4              Write_DATAFLASH_BYTE(DS1307_TIMER_EN_FLAG, timer_en_flag);
- 297   4              
- 298   4              printf("\nDISABLE\n");
- 299   4            }
- 300   3            else if((val_1 == 11) && (val_2 == 11) && (val_3 == 11))
- 301   3            {
- 302   4              timer_en_flag = HIGH;
-C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 12:49:56 PAGE 6   
+ 241   2          // parser data
+ 242   2          parser_data(header, hours, minutes, seconds, payLoad);
+ 243   2          
+ 244   2          if(!strcmp(header, "$C"))
+ 245   2          {
+ 246   3            rtc_time.hours       = atoi(hours);
+ 247   3            rtc_time.minutes     = atoi(minutes);
+ 248   3            rtc_time.seconds     = atoi(seconds);
+ 249   3            DS1307_Set_Current_Time(&rtc_time);
+ 250   3        
+ 251   3            printf("\nOK\n");
+ 252   3          }
+ 253   2          else if (!strcmp(header, "$S")) // time A
+ 254   2          {
+ 255   3            t_hour_begin     = atoi(hours);
+ 256   3            t_minute_begin   = atoi(minutes);
+ 257   3            t_second_begin   = atoi(seconds);
+ 258   3        
+ 259   3            Write_DATAFLASH_BYTE(DS1307_HOURS_START_ADDRESS, t_hour_begin);
+ 260   3            Write_DATAFLASH_BYTE(DS1307_MINUTE_START_ADDRESS, t_minute_begin);
+ 261   3            Write_DATAFLASH_BYTE(DS1307_SECOND_START_ADDRESS, t_second_begin);  
+ 262   3      
+ 263   3            printf("\nOK\n");     
+ 264   3          }
+ 265   2          else if (!strcmp(header, "$E")) // time B
+ 266   2          {
+ 267   3            t_hour_end     = atoi(hours);
+ 268   3            t_minute_end   = atoi(minutes);
+ 269   3            t_second_end   = atoi(seconds);
+ 270   3        
+ 271   3            Write_DATAFLASH_BYTE(DS1307_HOURS_STOP_ADDRESS, t_hour_end);
+ 272   3            Write_DATAFLASH_BYTE(DS1307_MINUTE_STOP_ADDRESS, t_minute_end);
+ 273   3            Write_DATAFLASH_BYTE(DS1307_SECOND_STOP_ADDRESS, t_second_end);     
+ 274   3      
+ 275   3            printf("\nOK\n");
+ 276   3          }
+ 277   2          else if (!strcmp(header, "$A")) // enable/disable timer
+ 278   2          {
+ 279   3            uint8_t val_1, val_2, val_3;
+ 280   3            
+ 281   3            val_1   = atoi(hours);
+ 282   3            val_2   = atoi(minutes);
+ 283   3            val_3   = atoi(seconds);
+ 284   3            
+ 285   3            if((val_1 == 0) && (val_2 == 0) && (val_3 == 0))
+ 286   3            {
+ 287   4              
+ 288   4              timer_en_flag = LOW;
+ 289   4              timer_flag = FLOATNG;
+ 290   4              
+ 291   4              Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
+ 292   4              Write_DATAFLASH_BYTE(DS1307_TIMER_EN_FLAG, timer_en_flag);
+ 293   4              
+ 294   4              printf("\nDISABLE\n");
+ 295   4            }
+ 296   3            else if((val_1 == 11) && (val_2 == 11) && (val_3 == 11))
+ 297   3            {
+ 298   4              timer_en_flag = HIGH;
+ 299   4              timer_flag = LOW;
+ 300   4              
+ 301   4              Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
+ 302   4              Write_DATAFLASH_BYTE(DS1307_TIMER_EN_FLAG, timer_en_flag);
+C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 17:55:14 PAGE 6   
 
- 303   4              timer_flag = LOW;
- 304   4              
- 305   4              Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
- 306   4              Write_DATAFLASH_BYTE(DS1307_TIMER_EN_FLAG, timer_en_flag);
- 307   4              
- 308   4              printf("\nENABLE\n");
- 309   4            }
+ 303   4              
+ 304   4              printf("\nENABLE\n");
+ 305   4            }
+ 306   3          }
+ 307   2          else
+ 308   2          {
+ 309   3            // do something here
  310   3          }
- 311   2          else
- 312   2          {
- 313   3            // do something here
- 314   3          }
- 315   2          
- 316   2          // clear buffer
- 317   2          index_data = 0;
- 318   2          memset(payLoad, 0, PAYLOAD_LEN);
- 319   2        }
- 320   1      }
- 321          
- 322          void parser_data(char *header, char *hours, char *minutes, char *seconds, char *payLoad)
- 323          {
- 324   1        char *p_rx, *p_header, *p_hours, *p_minutes, *p_seconds;
- 325   1        
- 326   1        // parser data => $C,23,17,05# - Set current time || $S,23,17,05# - Alarm on || $E,23,17,05# - Alarm off
- 327   1        if((header != NULL) && (hours != NULL) && (minutes != NULL) && (seconds != NULL) && (payLoad != NULL))
- 328   1        { 
- 329   2          p_rx = payLoad;
- 330   2          p_header = p_rx;
- 331   2          p_rx = strchr(p_header, ',');
- 332   2          if(p_rx != NULL)
- 333   2          {
- 334   3            *p_rx = 0;
- 335   3            strcpy(header, p_header);
- 336   3          }   
- 337   2          
- 338   2          p_hours = p_rx+1;
- 339   2          p_rx = strchr(p_hours, ',');
- 340   2          if(p_rx != NULL)
- 341   2          {
- 342   3              *p_rx = 0;
- 343   3              strcpy(hours, p_hours);
- 344   3          }
- 345   2          
- 346   2          p_minutes = p_rx+1;
- 347   2          p_rx = strchr(p_minutes, ',');
- 348   2          if(p_rx != NULL)
- 349   2          {
- 350   3              *p_rx = 0;
- 351   3              strcpy(minutes, p_minutes);
- 352   3          }
- 353   2          
- 354   2          p_seconds = p_rx+1;
- 355   2          p_rx = strchr(p_seconds, '#');
- 356   2          if(p_rx != NULL)
- 357   2          {
- 358   3              *p_rx = 0;
- 359   3              strcpy(seconds, p_seconds);
- 360   3          }
- 361   2        }
- 362   1      }
- 363          
- 364          void check_ds1307(void)
-C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 12:49:56 PAGE 7   
+ 311   2          
+ 312   2          // clear buffer
+ 313   2          index_data = 0;
+ 314   2          memset(payLoad, 0, PAYLOAD_LEN);
+ 315   2        }
+ 316   1      }
+ 317          
+ 318          void parser_data(char *header, char *hours, char *minutes, char *seconds, char *payLoad)
+ 319          {
+ 320   1        char *p_rx, *p_header, *p_hours, *p_minutes, *p_seconds;
+ 321   1        
+ 322   1        // parser data => $C,23,17,05# - Set current time || $S,23,17,05# - Alarm on || $E,23,17,05# - Alarm off
+ 323   1        if((header != NULL) && (hours != NULL) && (minutes != NULL) && (seconds != NULL) && (payLoad != NULL))
+ 324   1        { 
+ 325   2          p_rx = payLoad;
+ 326   2          p_header = p_rx;
+ 327   2          p_rx = strchr(p_header, ',');
+ 328   2          if(p_rx != NULL)
+ 329   2          {
+ 330   3            *p_rx = 0;
+ 331   3            strcpy(header, p_header);
+ 332   3          }   
+ 333   2          
+ 334   2          p_hours = p_rx+1;
+ 335   2          p_rx = strchr(p_hours, ',');
+ 336   2          if(p_rx != NULL)
+ 337   2          {
+ 338   3              *p_rx = 0;
+ 339   3              strcpy(hours, p_hours);
+ 340   3          }
+ 341   2          
+ 342   2          p_minutes = p_rx+1;
+ 343   2          p_rx = strchr(p_minutes, ',');
+ 344   2          if(p_rx != NULL)
+ 345   2          {
+ 346   3              *p_rx = 0;
+ 347   3              strcpy(minutes, p_minutes);
+ 348   3          }
+ 349   2          
+ 350   2          p_seconds = p_rx+1;
+ 351   2          p_rx = strchr(p_seconds, '#');
+ 352   2          if(p_rx != NULL)
+ 353   2          {
+ 354   3              *p_rx = 0;
+ 355   3              strcpy(seconds, p_seconds);
+ 356   3          }
+ 357   2        }
+ 358   1      }
+ 359          
+ 360          void check_ds1307(void)
+ 361          {
+ 362   1        if(request_ds1307_interval == HIGH)
+ 363   1        {
+ 364   2          
+C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 17:55:14 PAGE 7   
 
- 365          {
- 366   1        if(request_ds1307_interval == HIGH)
- 367   1        {
- 368   2          
- 369   2          if (timer_en_flag == HIGH) // if timer is ENABLE
- 370   2          {
- 371   3            // get current time
- 372   3            DS1307_Get_Current_Time(&rtc_time);
- 373   3            
- 374   3            // get current date
- 375   3            DS1307_Get_Current_Date(&rtc_date);
- 376   3            
- 377   3            if(timer_flag == LOW)
- 378   3            {
- 379   4              if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) == TIME2SECOND(t_hour_end, t_minute_end, 
+ 365   2          if (timer_en_flag == HIGH) // if timer is ENABLE
+ 366   2          {
+ 367   3            // get current time
+ 368   3            DS1307_Get_Current_Time(&rtc_time);
+ 369   3            
+ 370   3            // get current date
+ 371   3            DS1307_Get_Current_Date(&rtc_date);
+ 372   3            
+ 373   3            if(timer_flag == LOW)
+ 374   3            {
+ 375   4              if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) == TIME2SECOND(t_hour_end, t_minute_end, 
              -t_second_end))
- 380   4              {
- 381   5                timer_flag = FLOATNG;
- 382   5                Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
- 383   5                
- 384   5                printf("\SET TIMER ERROR\n");
- 385   5              }
- 386   4              
- 387   4              // relay 1 on and relay 2 off => 6.am - 17.pm
- 388   4              if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < (uint32_t)TIME2SECOND(t_hour_end, t_min
+ 376   4              {
+ 377   5                timer_flag = FLOATNG;
+ 378   5                Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
+ 379   5                
+ 380   5                printf("\SET TIMER ERROR\n");
+ 381   5              }
+ 382   4              
+ 383   4              // relay 1 on and relay 2 off => 6.am - 17.pm
+ 384   4              if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < (uint32_t)TIME2SECOND(t_hour_end, t_min
              -ute_end, t_second_end))
- 389   4              {
- 390   5                printf("1\n");
- 391   5                if((TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_begin, t_min
+ 385   4              {
+ 386   5                printf("1\n");
+ 387   5                if((TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_begin, t_min
              -ute_begin, t_second_begin)) && 
- 392   5                   (TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) < TIME2SECOND(t_hour_end, t_minute
+ 388   5                   (TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) < TIME2SECOND(t_hour_end, t_minute
              -_end, t_second_end)))
- 393   5                {
- 394   6                  LED_RELAY1 = HIGH;
- 395   6                  LED_RELAY2 = LOW;
- 396   6                  
- 397   6                  timer_flag = FLOATNG;
- 398   6                  timer_mode = LINE_TIME;
- 399   6                  
- 400   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
- 401   6                  Write_DATAFLASH_BYTE(DS1307_TIME_MODE_FLAG, timer_mode);
- 402   6                  
- 403   6                  printf("\n Jump into active mode 1\n");
- 404   6                }
- 405   5              }
- 406   4              
- 407   4              // relay 1 on and relay 2 off => 19.pm - 6.am
- 408   4              if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) > TIME2SECOND(t_hour_end, t_minute_end, t
+ 389   5                {
+ 390   6                  LED_RELAY1 = HIGH;
+ 391   6                  LED_RELAY2 = LOW;
+ 392   6                  
+ 393   6                  timer_flag = FLOATNG;
+ 394   6                  timer_mode_flag = LINE_TIME;
+ 395   6                  
+ 396   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
+ 397   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
+ 398   6                  
+ 399   6                  check_btn_last_state();
+ 400   6                  printf("\n Jump into active mode 1\n");
+ 401   6                }
+ 402   5              }
+ 403   4              
+ 404   4              // relay 1 on and relay 2 off => 19.pm - 6.am
+ 405   4              if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) > TIME2SECOND(t_hour_end, t_minute_end, t
              -_second_end))
- 409   4              {
- 410   5                printf("2\n");
- 411   5                if(TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_begin, t_minu
+ 406   4              {
+ 407   5                printf("2\n");
+ 408   5                if(TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_begin, t_minu
              -te_begin, t_second_begin))
- 412   5                {
- 413   6                  LED_RELAY1 = HIGH;
- 414   6                  LED_RELAY2 = LOW;
+ 409   5                {
+ 410   6                  LED_RELAY1 = HIGH;
+ 411   6                  LED_RELAY2 = LOW;
+ 412   6                  
+ 413   6                  timer_flag = FLOATNG;
+ 414   6                  timer_mode_flag = WRAP_TIME;
  415   6                  
- 416   6                  timer_flag = FLOATNG;
- 417   6                  timer_mode = WRAP_TIME;
- 418   6                  
- 419   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
- 420   6                  Write_DATAFLASH_BYTE(DS1307_TIME_MODE_FLAG, timer_mode);
-C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 12:49:56 PAGE 8   
+ 416   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
+ 417   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
+ 418   6            
+ 419   6                  check_btn_last_state();
+ 420   6                  printf("\n Jump into active mode 2\n");
+C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 17:55:14 PAGE 8   
 
- 421   6            
- 422   6                  printf("\n Jump into active mode 2\n");
- 423   6                } 
- 424   5              }
- 425   4            }
- 426   3            
- 427   3            if(timer_flag == FLOATNG)
- 428   3            {
- 429   4              // relay 1 and relay 2 off => 6.am - 17.pm
- 430   4              if((TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < TIME2SECOND(t_hour_end, t_minute_end, 
+ 421   6                } 
+ 422   5              }
+ 423   4            }
+ 424   3            
+ 425   3            if(timer_flag == FLOATNG)
+ 426   3            {
+ 427   4              // relay 1 and relay 2 off => 6.am - 17.pm
+ 428   4              if((TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < TIME2SECOND(t_hour_end, t_minute_end, 
              -t_second_end)) &&
- 431   4                 (timer_mode == LINE_TIME))
- 432   4              {
- 433   5                printf("12\n");
- 434   5      
- 435   5                if(TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) < TIME2SECOND(t_hour_begin, t_min
+ 429   4                 (timer_mode_flag == LINE_TIME))
+ 430   4              {
+ 431   5                printf("12\n");
+ 432   5      
+ 433   5                if(TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) < TIME2SECOND(t_hour_begin, t_min
              -ute_begin, t_second_begin))
- 436   5                {
- 437   6                  LED_RELAY1 = LOW;
- 438   6                  LED_RELAY2 = LOW;
- 439   6                  
- 440   6                  timer_flag = LOW;
- 441   6                  timer_mode = FLOATNG;
- 442   6                  
- 443   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
- 444   6                  Write_DATAFLASH_BYTE(DS1307_TIME_MODE_FLAG, timer_mode);
- 445   6                  
- 446   6                  printf("\n Jump out active mode 1 < \n");
- 447   6                }
- 448   5      
- 449   5                if(TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_end, t_minute
+ 434   5                {
+ 435   6                  LED_RELAY1 = LOW;
+ 436   6                  LED_RELAY2 = LOW;
+ 437   6                  
+ 438   6                  timer_flag = LOW;
+ 439   6                  timer_mode_flag = FLOATNG;
+ 440   6                  
+ 441   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
+ 442   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
+ 443   6                  
+ 444   6                  printf("\n Jump out active mode 1 < \n");
+ 445   6                }
+ 446   5      
+ 447   5                if(TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_end, t_minute
              -_end, t_second_end))
- 450   5                {
- 451   6                  LED_RELAY1 = LOW;
- 452   6                  LED_RELAY2 = LOW;
- 453   6                  
- 454   6                  timer_flag = LOW;
- 455   6                  timer_mode = FLOATNG;
- 456   6      
- 457   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
- 458   6                  Write_DATAFLASH_BYTE(DS1307_TIME_MODE_FLAG, timer_mode);
- 459   6                  
- 460   6                  printf("\n Jump out active mode 1 > \n");
- 461   6                }
- 462   5              }
- 463   4              
- 464   4              // relay 1 and relay 2 off => 19.pm - 6.am
- 465   4              if((TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) > TIME2SECOND(t_hour_end, t_minute_end, 
+ 448   5                {
+ 449   6                  LED_RELAY1 = LOW;
+ 450   6                  LED_RELAY2 = LOW;
+ 451   6                  
+ 452   6                  timer_flag = LOW;
+ 453   6                  timer_mode_flag = FLOATNG;
+ 454   6      
+ 455   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
+ 456   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
+ 457   6                  
+ 458   6                  printf("\n Jump out active mode 1 > \n");
+ 459   6                }
+ 460   5              }
+ 461   4              
+ 462   4              // relay 1 and relay 2 off => 19.pm - 6.am
+ 463   4              if((TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) > TIME2SECOND(t_hour_end, t_minute_end, 
              -t_second_end)) &&
- 466   4                 (timer_mode == WRAP_TIME))
- 467   4              {
- 468   5                printf("21\n"); 
- 469   5                if((TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) < TIME2SECOND(t_hour_begin, t_min
+ 464   4                 (timer_mode_flag == WRAP_TIME))
+ 465   4              {
+ 466   5                printf("21\n"); 
+ 467   5                if((TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) < TIME2SECOND(t_hour_begin, t_min
              -ute_begin, t_second_begin)) && // 6.am -> 19.pm
- 470   5                   (TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_end, t_minute
+ 468   5                   (TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_end, t_minute
              -_end, t_second_end)))
- 471   5                {
- 472   6                  LED_RELAY1 = LOW;
- 473   6                  LED_RELAY2 = LOW;
- 474   6                  
- 475   6                  timer_flag = LOW;
- 476   6                  timer_mode = FLOATNG;
-C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 12:49:56 PAGE 9   
+ 469   5                {
+ 470   6                  LED_RELAY1 = LOW;
+ 471   6                  LED_RELAY2 = LOW;
+ 472   6                  
+ 473   6                  timer_flag = LOW;
+ 474   6                  timer_mode_flag = FLOATNG;
+ 475   6                  
+ 476   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
+C51 COMPILER V9.60.0.0   APP                                                               03/18/2023 17:55:14 PAGE 9   
 
- 477   6                  
- 478   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
- 479   6                  Write_DATAFLASH_BYTE(DS1307_TIME_MODE_FLAG, timer_mode);
- 480   6                  
- 481   6                  printf("\n Jump out active mode 2\n");
- 482   6                }         
- 483   5              }
- 484   4            }
- 485   3          }
- 486   2          
- 487   2          request_ds1307_interval = LOW;
- 488   2        }
- 489   1      }
- 490          
- 491          /*********************************************************************************************************
+ 477   6                  Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
+ 478   6                  
+ 479   6                  printf("\n Jump out active mode 2\n");
+ 480   6                }         
+ 481   5              }
+ 482   4            }
+ 483   3          }
+ 484   2          
+ 485   2          request_ds1307_interval = LOW;
+ 486   2        }
+ 487   1      }
+ 488          
+ 489          /*********************************************************************************************************
              -***
- 492               Timer1 interrupt subroutine
- 493          **********************************************************************************************************
+ 490               Timer1 interrupt subroutine
+ 491          **********************************************************************************************************
              -**/
- 494          void Timer1_ISR (void) interrupt 3
- 495          {
- 496   1        _push_(SFRS);
- 497   1      
- 498   1        tick++;
- 499   1        if (tick >= 1000) // for 1s
- 500   1        {
- 501   2          request_ds1307_interval = HIGH;
- 502   2          tick = 0;
- 503   2        }
- 504   1        
- 505   1        TH1 = TH1_INIT;
- 506   1        TL1 = TL1_INIT;
- 507   1        TF0 = 0;
- 508   1        
- 509   1        _pop_(SFRS);
- 510   1      }
+ 492          void Timer1_ISR (void) interrupt 3
+ 493          {
+ 494   1        _push_(SFRS);
+ 495   1      
+ 496   1        tick++;
+ 497   1        if (tick >= 1000) // for 1s
+ 498   1        {
+ 499   2          request_ds1307_interval = HIGH;
+ 500   2          tick = 0;
+ 501   2        }
+ 502   1        
+ 503   1        TH1 = TH1_INIT;
+ 504   1        TL1 = TL1_INIT;
+ 505   1        TF0 = 0;
+ 506   1        
+ 507   1        _pop_(SFRS);
+ 508   1      }
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =   3404    ----
+   CODE SIZE        =   3344    ----
    CONSTANT SIZE    =    205    ----
    XDATA SIZE       =     34      12
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =      7      39
+   DATA SIZE        =      7      37
    IDATA SIZE       =   ----    ----
    BIT SIZE         =   ----    ----
 END OF MODULE INFORMATION.

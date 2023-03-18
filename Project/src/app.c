@@ -16,7 +16,7 @@ static STATE_t state         = NORMAL;
 
 static uint8_t timer_flag    = FLOATNG;
 static uint8_t timer_en_flag = LOW;
-static uint8_t timer_mode    = FLOATNG;
+static uint8_t timer_mode_flag    = FLOATNG;
 
 char xdata payLoad[PAYLOAD_LEN];
 unsigned char xdata index_data = 0;
@@ -56,18 +56,13 @@ void app_process_action(void)
 	check_ds1307();
 }
 
-uint32_t time2second(uint8_t h, uint8_t m, uint8_t s) 
-{
-	return (uint32_t)((uint32_t)(h)*3600 + (uint32_t)(m)*60 + (uint8_t)(s));
-}
-
 void uart_init(void)
 {
 	UART_Open(FREQ_SYS, UART0_Timer3, 9600);
 	ENABLE_UART0_PRINTF;
-  ENABLE_UART0_INTERRUPT;   /* Enable UART0 interrupt */
-  ENABLE_GLOBAL_INTERRUPT;  /* Global interrupt enable */
-	
+	ENABLE_UART0_INTERRUPT;   /* Enable UART0 interrupt */
+	ENABLE_GLOBAL_INTERRUPT;  /* Global interrupt enable */
+
 	uartFresh();
 }
 
@@ -149,12 +144,12 @@ void check_button(void)
 
 void check_btn_last_state(void)
 { 	
-	uint8_t last_state;
+	uint8_t tmp;
 	
-	last_state = Read_APROM_BYTE(STATE_MODE);
-	if(last_state != 0xFF)
+	tmp = Read_APROM_BYTE(STATE_MODE);
+	if(tmp != 0xFF)
 	{
-		state = last_state;
+		state = tmp;
 	}
 	
 	if(state == NORMAL)
@@ -182,14 +177,14 @@ void check_timer(void)
 	t_minute_begin   = Read_APROM_BYTE(DS1307_MINUTE_START_ADDRESS);
 	t_second_begin   = Read_APROM_BYTE(DS1307_SECOND_START_ADDRESS);
 	
-  t_hour_end    = Read_APROM_BYTE(DS1307_HOURS_STOP_ADDRESS);
-	t_minute_end  = Read_APROM_BYTE(DS1307_MINUTE_STOP_ADDRESS);
-	t_second_end  = Read_APROM_BYTE(DS1307_SECOND_STOP_ADDRESS);
+  t_hour_end       = Read_APROM_BYTE(DS1307_HOURS_STOP_ADDRESS);
+	t_minute_end     = Read_APROM_BYTE(DS1307_MINUTE_STOP_ADDRESS);
+	t_second_end     = Read_APROM_BYTE(DS1307_SECOND_STOP_ADDRESS);
 	
-	tmp = Read_APROM_BYTE(DS1307_TIME_MODE_FLAG);	
+	tmp = Read_APROM_BYTE(DS1307_TIMER_MODE_FLAG);	
 	if(tmp != 0xff)
 	{
-		timer_mode = tmp;
+		timer_mode_flag = tmp;
 	}
 	
 	tmp = Read_APROM_BYTE(DS1307_TIMER_FLAG);
@@ -289,6 +284,7 @@ void check_uart(void)
 			
 			if((val_1 == 0) && (val_2 == 0) && (val_3 == 0))
 			{
+				
 				timer_en_flag = LOW;
 				timer_flag = FLOATNG;
 				
@@ -395,11 +391,12 @@ void check_ds1307(void)
 						LED_RELAY2 = LOW;
 						
 						timer_flag = FLOATNG;
-						timer_mode = LINE_TIME;
+						timer_mode_flag = LINE_TIME;
 						
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
-						Write_DATAFLASH_BYTE(DS1307_TIME_MODE_FLAG, timer_mode);
+						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
 						
+						check_btn_last_state();
 						printf("\n Jump into active mode 1\n");
 					}
 				}
@@ -414,11 +411,12 @@ void check_ds1307(void)
 						LED_RELAY2 = LOW;
 						
 						timer_flag = FLOATNG;
-						timer_mode = WRAP_TIME;
+						timer_mode_flag = WRAP_TIME;
 						
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
-						Write_DATAFLASH_BYTE(DS1307_TIME_MODE_FLAG, timer_mode);
+						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
 			
+						check_btn_last_state();
 						printf("\n Jump into active mode 2\n");
 					}	
 				}
@@ -428,7 +426,7 @@ void check_ds1307(void)
 			{
 				// relay 1 and relay 2 off => 6.am - 17.pm
 				if((TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < TIME2SECOND(t_hour_end, t_minute_end, t_second_end)) &&
-					 (timer_mode == LINE_TIME))
+					 (timer_mode_flag == LINE_TIME))
 				{
 					printf("12\n");
 
@@ -438,10 +436,10 @@ void check_ds1307(void)
 						LED_RELAY2 = LOW;
 						
 						timer_flag = LOW;
-						timer_mode = FLOATNG;
+						timer_mode_flag = FLOATNG;
 						
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
-						Write_DATAFLASH_BYTE(DS1307_TIME_MODE_FLAG, timer_mode);
+						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
 						
 						printf("\n Jump out active mode 1 < \n");
 					}
@@ -452,10 +450,10 @@ void check_ds1307(void)
 						LED_RELAY2 = LOW;
 						
 						timer_flag = LOW;
-						timer_mode = FLOATNG;
+						timer_mode_flag = FLOATNG;
 
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
-						Write_DATAFLASH_BYTE(DS1307_TIME_MODE_FLAG, timer_mode);
+						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
 						
 						printf("\n Jump out active mode 1 > \n");
 					}
@@ -463,7 +461,7 @@ void check_ds1307(void)
 				
 				// relay 1 and relay 2 off => 19.pm - 6.am
 				if((TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) > TIME2SECOND(t_hour_end, t_minute_end, t_second_end)) &&
-					 (timer_mode == WRAP_TIME))
+					 (timer_mode_flag == WRAP_TIME))
 				{
 					printf("21\n");	
 					if((TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) < TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin)) && // 6.am -> 19.pm
@@ -473,10 +471,10 @@ void check_ds1307(void)
 						LED_RELAY2 = LOW;
 						
 						timer_flag = LOW;
-						timer_mode = FLOATNG;
+						timer_mode_flag = FLOATNG;
 						
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
-						Write_DATAFLASH_BYTE(DS1307_TIME_MODE_FLAG, timer_mode);
+						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
 						
 						printf("\n Jump out active mode 2\n");
 					}					
