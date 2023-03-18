@@ -15,7 +15,7 @@
 
 #define PAYLOAD_LEN    13
 
-#define TIME2SECOND(h, m, s) (uint32_t)((h)*3600 + (m)*60 + (s))
+#define TIME2SECOND(h, m, s) (long)((long)(h)*3600 + (long)(m)*60 + (long)(s))
 
 typedef enum STATUS {
 	OFF = 0,

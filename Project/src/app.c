@@ -361,7 +361,6 @@ void check_ds1307(void)
 {
 	if(request_ds1307_interval == HIGH)
 	{
-		
 		if (timer_en_flag == HIGH) // if timer is ENABLE
 		{
 			// get current time
@@ -381,7 +380,7 @@ void check_ds1307(void)
 				}
 				
 				// relay 1 on and relay 2 off => 6.am - 17.pm
-				if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < (uint32_t)TIME2SECOND(t_hour_end, t_minute_end, t_second_end))
+				if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < TIME2SECOND(t_hour_end, t_minute_end, t_second_end))
 				{
 					printf("1\n");
 					if((TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin)) && 
