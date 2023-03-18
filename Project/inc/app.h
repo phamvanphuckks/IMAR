@@ -15,11 +15,11 @@
 
 #define PAYLOAD_LEN    13
 
-#define TIME2SECOND(h, m, s) ((h)*3600 + (m)*60 + (s))
+#define TIME2SECOND(h, m, s) (uint32_t)((h)*3600 + (m)*60 + (s))
 
 typedef enum STATUS {
-	ON  = 1,
-	OFF = !ON,
+	OFF = 0,
+	ON,
 	FLOATNG,
 	WRAP_TIME,
 	LINE_TIME
@@ -74,7 +74,7 @@ void uart_init(void);
 void check_button(void);
 void check_btn_last_state(void);
 void check_timer(void);
-void ds1307(void);
+void check_ds1307(void);
 void check_uart(void);
 void parser_data(char *header, char *hours, char *minutes, char *seconds, char *payLoad);
 

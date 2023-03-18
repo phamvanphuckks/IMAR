@@ -28,7 +28,8 @@
 #define DS1307_YEAR_STOP_ADDRESS                0x3035 
 
 #define DS1307_TIMER_FLAG                       0x3040
-#define DS1307_TIME_MODE_FLAG                  0x3041
+#define DS1307_TIMER_EN_FLAG                    0x3041
+#define DS1307_TIME_MODE_FLAG                   0x3042
 
 #define FREQ_SYS	  16000000
 #endif
