@@ -274,10 +274,6 @@ void check_uart(void)
 		
 		// parser data
 		parser_data(header, hours, minutes, seconds, payLoad);
-		printf("\n%s\n", header);
-		printf("\n%s\n", hours);
-		printf("\n%s\n", minutes);
-		printf("\n%s\n", seconds);
 		
 		if(!strcmp(header, "$C"))
     {

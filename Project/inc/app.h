@@ -14,7 +14,7 @@
 #include "ds1307.h"
 
 #define PAYLOAD_LEN    13
-#define LOG_ENABLE     1
+#define LOG_ENABLE     0
 #define TIME2SECOND(h, m, s) (long)((long)(h)*3600 + (long)(m)*60 + (long)(s))
 
 typedef enum STATUS {
