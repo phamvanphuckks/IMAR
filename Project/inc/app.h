@@ -5,16 +5,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "hw_config.h"
 #include "MS51_16K.H"
+#include "hw_config.h"
 #include "delay.h"
 #include "gpio.h"
 #include "uart.h"
 #include "timerx.h"
 #include "ds1307.h"
 
-#define PAYLOAD_LEN    13
-#define LOG_ENABLE     0
+#define PAYLOAD_LEN          13
+#define LOG_DEBUG            0
+
+// MACRO to convert to second unit
 #define TIME2SECOND(h, m, s) (long)((long)(h)*3600 + (long)(m)*60 + (long)(s))
 
 typedef enum STATUS {

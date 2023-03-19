@@ -432,7 +432,7 @@ void check_ds1307(void)
 				// relay 1 on and relay 2 off => 6.am - 17.pm
 				if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < TIME2SECOND(t_hour_end, t_minute_end, t_second_end))
 				{
-#if LOG_ENABLE
+#if LOG_DEBUG
 					printf("1\r\n");
 #endif
 					if((TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin)) &&
@@ -448,7 +448,7 @@ void check_ds1307(void)
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
 						
 						check_btn_last_state();
-#if LOG_ENABLE
+#if LOG_DEBUG
 						printf("Jump into active mode 1\r\n");
 #endif
 					}
@@ -457,7 +457,7 @@ void check_ds1307(void)
 				// relay 1 on and relay 2 off => 19.pm - 6.am
 				if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) > TIME2SECOND(t_hour_end, t_minute_end, t_second_end))
 				{
-#if LOG_ENABLE
+#if LOG_DEBUG
 					printf("2\r\n");
 #endif
 					if(TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin))
@@ -472,7 +472,7 @@ void check_ds1307(void)
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
 			
 						check_btn_last_state();
-#if LOG_ENABLE
+#if LOG_DEBUG
 						printf("Jump into active mode 2\r\n");
 #endif
 					}
@@ -485,7 +485,7 @@ void check_ds1307(void)
 				if((TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < TIME2SECOND(t_hour_end, t_minute_end, t_second_end)) &&
 					 (timer_mode_flag == LINE_TIME))
 				{
-#if LOG_ENABLE
+#if LOG_DEBUG
 					printf("12\r\n");
 #endif
   				if(TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) < TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin))
@@ -498,7 +498,7 @@ void check_ds1307(void)
 						
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
-#if LOG_ENABLE						
+#if LOG_DEBUG						
 						printf("Jump out active mode 1 < \r\n");
 #endif
 					}
@@ -513,7 +513,7 @@ void check_ds1307(void)
 
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
-#if LOG_ENABLE						
+#if LOG_DEBUG						
 						printf("Jump out active mode 1 > \r\n");
 #endif
 					}
@@ -523,7 +523,7 @@ void check_ds1307(void)
 				if((TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) > TIME2SECOND(t_hour_end, t_minute_end, t_second_end)) &&
 					 (timer_mode_flag == WRAP_TIME))
 				{
-#if LOG_ENABLE	
+#if LOG_DEBUG	
 					printf("21\r\n");	
 #endif
 					if((TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) < TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin)) && // 6.am -> 19.pm
@@ -537,7 +537,7 @@ void check_ds1307(void)
 						
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
-#if LOG_ENABLE							
+#if LOG_DEBUG							
 						printf("Jump out active mode 2\r\n");
 #endif
 					}					
