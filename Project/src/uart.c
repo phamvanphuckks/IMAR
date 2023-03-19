@@ -17,8 +17,7 @@ unsigned char uart0_receive_data, uart1_receive_data;
 
 // ring buffer
 volatile char xdata Rx_buffer[MAX_BUFFER];
-volatile uint16_t pHead = 0, pTail = 0;
-
+static uint16_t pHead = 0, pTail = 0;
 
 uint8_t IsAvailable(void)
 {
@@ -40,7 +39,7 @@ void uartFresh(void)
 
 void uartResetNByte(uint8_t len)
 {
-	memset(&Rx_buffer[pHead - len], 0, len);
+	memset(&Rx_buffer[pTail - len], 0, len);
 }
 
 uint8_t IsEmpty(void) 
