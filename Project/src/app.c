@@ -251,6 +251,7 @@ void check_timer(void)
 void check_uart(void)
 {
 	char xdata header[3], hours[3], minutes[3], seconds[3];
+	uint8_t tmp = 0;
 	
 	if (IsData() == '#')
 	{
@@ -332,6 +333,12 @@ void check_uart(void)
 			
 			if((val_1 == 0) && (val_2 == 0) && (val_3 == 0))
 			{
+				tmp = Read_APROM_BYTE(DS1307_LED_STATUS_TIMER);
+				if((tmp != 0xff) && (timer_en_flag == HIGH))
+				{
+					state = tmp;
+					Write_DATAFLASH_BYTE(STATE_MODE, state);
+				}
 				
 				timer_en_flag = LOW;
 				timer_flag = FLOATNG;
@@ -448,6 +455,16 @@ void check_ds1307(void)
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
 						
 						check_btn_last_state();
+						
+						if((LED_RELAY1 != HIGH) && (LED_RELAY2 != LOW))
+						{
+							LED_RELAY1 = HIGH;
+							LED_RELAY2 = LOW;
+							
+							Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
+							Write_DATAFLASH_BYTE(DS1307_LED_STATUS_TIMER, state);
+							state = NORMAL;
+						}
 #if LOG_DEBUG
 						printf("Jump into active mode 1\r\n");
 #endif
@@ -472,6 +489,16 @@ void check_ds1307(void)
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
 			
 						check_btn_last_state();
+						
+						if((LED_RELAY1 != HIGH) && (LED_RELAY2 != LOW))
+						{
+							LED_RELAY1 = HIGH;
+							LED_RELAY2 = LOW;
+							
+							Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
+							Write_DATAFLASH_BYTE(DS1307_LED_STATUS_TIMER, state);
+							state = NORMAL;
+						}
 #if LOG_DEBUG
 						printf("Jump into active mode 2\r\n");
 #endif
