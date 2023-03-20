@@ -44,6 +44,13 @@ void app_init(void)
 	// Initialize DS1307
 	DS1307_Init();
 	
+	rtc_time.hours   = 0;
+	rtc_time.minutes = 0;
+	rtc_time.seconds = 0;
+	DS1307_Set_Current_Time(&rtc_time);	
+	Delay_ms(100);
+	DS1307_Get_Current_Time(&rtc_time);
+	
 	// Load flash
 	check_btn_last_state();
 	check_timer();
@@ -75,74 +82,71 @@ void check_button(void)
 {
 	uint16_t timeout = 0, last_state;
 	
-	if (timer_flag == FLOATNG)
+	if (state == NORMAL)
 	{
-		if (state == NORMAL)
+		if(BTN2_PAS == HIGH)
 		{
-			if(BTN2_PAS == HIGH)
+			LED_RELAY2 = HIGH;
+			Delay_ms(10);
+			while (BTN2_PAS == HIGH)
 			{
-				LED_RELAY2 = HIGH;
-				Delay_ms(10);
-				while (BTN2_PAS == HIGH)
+				if(timeout == 2000)
 				{
-					if(timeout == 2000)
+					LED_RELAY1 = LOW;         
+					LED_RELAY2 = HIGH;
+					state = PASS_HOLD_3S;
+					
+					last_state = Read_APROM_BYTE(STATE_MODE);
+					if(last_state != PASS_HOLD_3S)
 					{
-						LED_RELAY1 = LOW;         
-						LED_RELAY2 = HIGH;
-						state = PASS_HOLD_3S;
-						
-						last_state = Read_APROM_BYTE(STATE_MODE);
-						if(last_state != PASS_HOLD_3S)
-						{
-							Write_DATAFLASH_BYTE(STATE_MODE, state);
-						}
+						Write_DATAFLASH_BYTE(STATE_MODE, state);
 					}
-					Delay_ms(1);
-					timeout++;
 				}
-			}
-			else 
-			{
-				LED_RELAY2 = (BTN1_COS == HIGH)? HIGH : LOW;
+				Delay_ms(1);
+				timeout++;
 			}
 		}
-		
-		if (state == PASS_HOLD_3S)
+		else 
 		{
-			if(BTN2_PAS == HIGH)
+			LED_RELAY2 = (BTN1_COS == HIGH)? HIGH : LOW;
+		}
+	}
+	
+	if (state == PASS_HOLD_3S)
+	{
+		if(BTN2_PAS == HIGH)
+		{
+			LED_RELAY1 = HIGH;
+			Delay_ms(10);
+			
+			timeout = 0;
+			while (BTN2_PAS == HIGH)
 			{
-				LED_RELAY1 = HIGH;
-				Delay_ms(10);
-				
-				timeout = 0;
-				while (BTN2_PAS == HIGH)
+				if(timeout == 2000)
 				{
-					if(timeout == 2000)
+					LED_RELAY2 = LOW;
+
+					LED_RELAY1 = HIGH;
+					Delay_ms(100);
+					LED_RELAY1 = LOW;
+					Delay_ms(100);
+					LED_RELAY1 = HIGH;
+
+					state = NORMAL;
+
+					last_state = Read_APROM_BYTE(STATE_MODE);
+					if(last_state != NORMAL)
 					{
-						LED_RELAY2 = LOW;
-
-						LED_RELAY1 = HIGH;
-						Delay_ms(100);
-						LED_RELAY1 = LOW;
-						Delay_ms(100);
-						LED_RELAY1 = HIGH;
-
-						state = NORMAL;
-
-						last_state = Read_APROM_BYTE(STATE_MODE);
-						if(last_state != NORMAL)
-						{
-							Write_DATAFLASH_BYTE(STATE_MODE, state);
-						}
+						Write_DATAFLASH_BYTE(STATE_MODE, state);
 					}
-					Delay_ms(1);
-					timeout++;
 				}
+				Delay_ms(1);
+				timeout++;
 			}
-			else
-			{
-				LED_RELAY1 = 0;
-			}
+		}
+		else
+		{
+			LED_RELAY1 = 0;
 		}
 	}
 }
@@ -232,19 +236,24 @@ void check_timer(void)
 		timer_en_flag = tmp;
 	}
 	
-	if(timer_flag == HIGH)
+	if(timer_en_flag == HIGH)
 	{
-		LED_RELAY1 = HIGH;
-		LED_RELAY2 = LOW;
-	}
-	else if(timer_flag == LOW)
-	{
-		LED_RELAY1 = LOW;
-		LED_RELAY2 = LOW;
-	}
-	else 
-	{
-		
+		if((timer_mode_flag == WRAP_TIME) || (timer_mode_flag == LINE_TIME)) // during A-B
+		{
+			LED_RELAY1 = HIGH;
+			LED_RELAY2 = LOW;
+			
+			Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
+			state = NORMAL;
+		}
+		else if(timer_flag == LOW) // out of range A-B
+		{
+			LED_RELAY1 = LOW;
+			LED_RELAY2 = LOW;
+			
+			Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
+			state = NORMAL;
+		}
 	}
 }
 
@@ -275,14 +284,14 @@ void check_uart(void)
 		
 		// parser data
 		parser_data(header, hours, minutes, seconds, payLoad);
-		
+
 		if(!strcmp(header, "$C"))
     {
 			rtc_time.hours       = atoi(hours);
 			rtc_time.minutes     = atoi(minutes);
 			rtc_time.seconds     = atoi(seconds);
 			DS1307_Set_Current_Time(&rtc_time);
-	
+			
 			printf("OK\r\n");
 		}
 		else if (!strcmp(header, "$S")) // time A
@@ -333,13 +342,6 @@ void check_uart(void)
 			
 			if((val_1 == 0) && (val_2 == 0) && (val_3 == 0))
 			{
-				tmp = Read_APROM_BYTE(DS1307_LED_STATUS_TIMER);
-				if((tmp != 0xff) && (timer_en_flag == HIGH))
-				{
-					state = tmp;
-					Write_DATAFLASH_BYTE(STATE_MODE, state);
-				}
-				
 				timer_en_flag = LOW;
 				timer_flag = FLOATNG;
 				
@@ -357,6 +359,25 @@ void check_uart(void)
 				
 				Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
 				Write_DATAFLASH_BYTE(DS1307_TIMER_EN_FLAG, timer_en_flag);
+				
+				// check -> out of range A-B -> relay 1 and relay 2 off
+				if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < TIME2SECOND(t_hour_end, t_minute_end, t_second_end))
+				{
+					LED_RELAY1 = LOW;
+					LED_RELAY2 = LOW;
+					
+					Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
+					state = NORMAL;
+				}
+				
+				if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) > TIME2SECOND(t_hour_end, t_minute_end, t_second_end))
+				{
+					LED_RELAY1 = LOW;
+					LED_RELAY2 = LOW;
+					
+					Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
+					state = NORMAL;
+				}
 				
 				printf("ENABLE\r\n");
 			}
@@ -424,15 +445,12 @@ void check_ds1307(void)
 			DS1307_Get_Current_Time(&rtc_time);
 
 			// get current date
-			DS1307_Get_Current_Date(&rtc_date);
+			//DS1307_Get_Current_Date(&rtc_date);
 
 			if(timer_flag == LOW) // Phase 1 during A - B
 			{
 				if(TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) == TIME2SECOND(t_hour_end, t_minute_end, t_second_end))
 				{
-					timer_flag = FLOATNG;
-					Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
-					
 					printf("SET TIMER ERROR\r\n");
 				}
 				
@@ -444,27 +462,22 @@ void check_ds1307(void)
 #endif
 					if((TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) > TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin)) &&
 						 (TIME2SECOND(rtc_time.hours, rtc_time.minutes, rtc_time.seconds) < TIME2SECOND(t_hour_end, t_minute_end, t_second_end)))
-					{
+					{		
 						LED_RELAY1 = HIGH;
 						LED_RELAY2 = LOW;
 						
-						timer_flag = FLOATNG;
+						timer_flag = HIGH;
 						timer_mode_flag = LINE_TIME;
 						
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
 						
-						check_btn_last_state();
-						
-						if((LED_RELAY1 != HIGH) && (LED_RELAY2 != LOW))
+						if(state == PASS_HOLD_3S)
 						{
-							LED_RELAY1 = HIGH;
-							LED_RELAY2 = LOW;
-							
 							Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
-							Write_DATAFLASH_BYTE(DS1307_LED_STATUS_TIMER, state);
 							state = NORMAL;
 						}
+						
 #if LOG_DEBUG
 						printf("Jump into active mode 1\r\n");
 #endif
@@ -481,24 +494,19 @@ void check_ds1307(void)
 					{
 						LED_RELAY1 = HIGH;
 						LED_RELAY2 = LOW;
-						
-						timer_flag = FLOATNG;
+
+						timer_flag = HIGH;
 						timer_mode_flag = WRAP_TIME;
-						
+
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
-			
-						check_btn_last_state();
-						
-						if((LED_RELAY1 != HIGH) && (LED_RELAY2 != LOW))
+
+						if(state == PASS_HOLD_3S)
 						{
-							LED_RELAY1 = HIGH;
-							LED_RELAY2 = LOW;
-							
 							Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
-							Write_DATAFLASH_BYTE(DS1307_LED_STATUS_TIMER, state);
 							state = NORMAL;
 						}
+						
 #if LOG_DEBUG
 						printf("Jump into active mode 2\r\n");
 #endif
@@ -506,7 +514,7 @@ void check_ds1307(void)
 				}
 			}
 			
-			if(timer_flag == FLOATNG) // Phase 2 during A - B
+			if(timer_flag == HIGH) // Phase 2 during A - B
 			{
 				// relay 1 and relay 2 off => 6.am - 17.pm
 				if((TIME2SECOND(t_hour_begin, t_minute_begin, t_second_begin) < TIME2SECOND(t_hour_end, t_minute_end, t_second_end)) &&
@@ -525,6 +533,13 @@ void check_ds1307(void)
 						
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
+						
+						if(state == PASS_HOLD_3S)
+						{
+							Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
+							state = NORMAL;
+						}
+						
 #if LOG_DEBUG						
 						printf("Jump out active mode 1 < \r\n");
 #endif
@@ -540,6 +555,13 @@ void check_ds1307(void)
 
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
+						
+						if(state == PASS_HOLD_3S)
+						{
+							Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
+							state = NORMAL;
+						}
+						
 #if LOG_DEBUG						
 						printf("Jump out active mode 1 > \r\n");
 #endif
@@ -564,6 +586,13 @@ void check_ds1307(void)
 						
 						Write_DATAFLASH_BYTE(DS1307_TIMER_FLAG, timer_flag);
 						Write_DATAFLASH_BYTE(DS1307_TIMER_MODE_FLAG, timer_mode_flag);
+						
+						if(state == PASS_HOLD_3S)
+						{
+							Write_DATAFLASH_BYTE(STATE_MODE, NORMAL);
+							state = NORMAL;
+						}
+						
 #if LOG_DEBUG							
 						printf("Jump out active mode 2\r\n");
 #endif

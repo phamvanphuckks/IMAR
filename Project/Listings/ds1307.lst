@@ -1,4 +1,4 @@
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 1   
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 1   
 
 
 C51 COMPILER V9.60.0.0, COMPILATION OF MODULE DS1307
@@ -62,7 +62,7 @@ line level    source
   51   2          ++t;
   52   2        }
   53   1        
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 2   
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 2   
 
   54   1        if (u8TimeOut) {
   55   2          /* start error */
@@ -126,7 +126,7 @@ line level    source
  113   1        
  114   1        if (u8TimeOut) {
  115   2          /* send address error */
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 3   
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 3   
 
  116   2          send_stop();
  117   2          return 0;
@@ -190,7 +190,7 @@ line level    source
  175   1        while (1) {
  176   2          if (SI) {
  177   3            break;
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 4   
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 4   
 
  178   3          }
  179   2          if (!t) {
@@ -254,7 +254,7 @@ line level    source
  237   3            break;
  238   3          }
  239   2          if (!t) {
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 5   
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 5   
 
  240   3            u8TimeOut = 1;
  241   3            break;
@@ -318,7 +318,7 @@ line level    source
  299   2          if (!t) {
  300   3            u8TimeOut = 1;
  301   3            break;
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 6   
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 6   
 
  302   3          }
  303   2          ++t;
@@ -382,7 +382,7 @@ line level    source
  361   2        }
  362   1        if (u8TimeOut) {
  363   2          /* send data error */
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 7   
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 7   
 
  364   2          send_stop();
  365   2          return 0;
@@ -446,7 +446,7 @@ line level    source
  423   1        while (1) {
  424   2          if (SI) {
  425   3            break;
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 8   
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 8   
 
  426   3          }
  427   2          if (!t) {
@@ -510,7 +510,7 @@ line level    source
  485   1        u8TimeOut = 0;
  486   1        while (1) {
  487   2          if (I2STAT == 0xF8) {
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 9   
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 9   
 
  488   3            break;
  489   3          }
@@ -574,7 +574,7 @@ line level    source
  547   3            hours |= (1 << 5);
  548   3          }
  549   2          else 
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 10  
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 10  
 
  550   2          {
  551   3            hours &= ~(1 << 5);
@@ -638,7 +638,7 @@ line level    source
  609   1        
  610   1        DS1307_Read(DS1307_MONTH, &month, 1);
  611   1        rtc_date->month = bcd2dec(month);
-C51 COMPILER V9.60.0.0   DS1307                                                            03/19/2023 19:35:20 PAGE 11  
+C51 COMPILER V9.60.0.0   DS1307                                                            03/20/2023 23:12:10 PAGE 11  
 
  612   1        
  613   1        DS1307_Read(DS1307_YEAR, &year, 1);
